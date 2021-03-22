@@ -1,8 +1,4 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
     "configurations": [
         {
             "name": "Attach to Chrome",
@@ -13,10 +9,9 @@
         },
         {
             "type": "pwa-chrome",
+            "name": "http://file:///C:/Users/corin/Downloads/particle%20system%20complete%20from%20lecture/particle%20system%20complete%20from%20lecture/index.html",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "file:///C:/Users/corin/Desktop/Computer%20Science/Programming/Java%20Script/Drawings/Particle%20System/partical%20system%20start/index.html",
-            "webRoot": "${workspaceFolder}"
+            "url": "http://file:///C:/Users/corin/Downloads/particle%20system%20complete%20from%20lecture/particle%20system%20complete%20from%20lecture/index.html"
         }
     ]
 }
