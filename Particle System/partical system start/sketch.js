@@ -13,6 +13,8 @@
 */
 
 var emit;
+var emit2;
+var emit3;
 
 function Particle(x ,y, xSpeed, ySpeed, size, colour)
 {
@@ -29,6 +31,8 @@ function Particle(x ,y, xSpeed, ySpeed, size, colour)
 	this.drawParticle = function()
 	{	
 		fill(this.colour);
+		noStroke;
+		strokeWeight(0);
 		ellipse(this.x, this.y, this. size);
 	}
 
@@ -59,11 +63,11 @@ function Emitter(x, y, xSpeed, ySpeed, size, colour)
 	this.addParticle = function()
 	{
 		var p = new Particle(
-			random(this.x - 10, this.x + 10),
-			random(this.y - 10, this.y + 10),
+			random(this.x - 40, this.x + 40),
+			random(this.y - 20, this.y + 20),
 			random(this.xSpeed - 1, this.xSpeed + 1), 
 			random(this.ySpeed - 1, this.ySpeed + 1),
-			random(this.size -4, this.size + 4),
+			random(this.size -5, this.size + 5),
 			this.colour);	
 		return p;
 	}
@@ -110,7 +114,6 @@ function Emitter(x, y, xSpeed, ySpeed, size, colour)
 }
 
 
-
 function setup()
 {
 	createCanvas(800,600);
@@ -118,17 +121,41 @@ function setup()
 		width/2,				//x
 		height - 100,			//y
 		0,						//xSpeed
-		-1,						//ySpeed
-		 30,					//size
-		 color(200, 0 , 200)	//colour
+		-8,					    //ySpeed
+		 20,					//size
+		 color(255, 255,  0, 10)//colour
 		);
 	
-	emit.startEmitter(300, 200);
+	emit.startEmitter(300, 100);
+
+	emit2 = new Emitter(
+		width/2,				//x
+		height - 200,			//y
+		0,						//xSpeed
+		-8,					    //ySpeed
+		 25,					//size
+		 color(255,0,10, 10)	    //colour
+		);
+	
+	emit2.startEmitter(300, 300);
+
+	emit3 = new Emitter(
+		width/2,				//x
+		height - 150,			//y
+		0,						//xSpeed
+		-8,					    //ySpeed
+		 20,					//size
+		 color(255, 140, 0, 10)	//colour
+		);
+	
+	emit3.startEmitter(300, 300);	
 }
 
 function draw()
 {
 	background(0);
 	emit.updateParticles();
+	emit2.updateParticles();
+	emit3.updateParticles();
 
 }
