@@ -2,9 +2,7 @@
 //Object orientation revisted
 //UFO
 
-var ufo_x;
-var ufo_y;
-
+var ufo;
 var trees;
 var clouds;
 
@@ -13,8 +11,59 @@ function setup()
     createCanvas(800,600);
     noStroke();
     
-    ufo_x = 500;
-    ufo_y = 250;
+    ufo ={
+        x: 500,
+        y: 250,
+        width: 220,
+        height: 60,
+        window_width:0.5,
+        window_height: 1.2,
+        base_height: 0.45,
+        num_lights: 20,
+        brightness: [],
+        beam_on: false,
+        
+        hover: function(){
+            
+            this.x += random(-2, 2);
+            this.y += random(-1, 1);
+        },
+        
+        lights_on: function(){
+            
+            var increment = this.width/(this.num_lights - 1);
+    
+            fill(255);
+            for(var i = 0; i < this.num_lights; i++){
+
+                fill(this.brightness[i])
+                ellipse(
+                    this.x - this.width/2 + increment * i, 
+                    this.y, 
+                    5
+                    );
+
+                //Animating lights
+                this.brightness[i] += 1;
+                this.brightness[i] =this.brightness[i] % 255;
+        }
+},
+        
+        beam: function(){
+        
+            fill(255,255, 100, 150);
+            
+            //Induces Flickering
+            if(random() > 0.05){
+                beginShape();
+                vertex(this.x - this.width * 0.25, this.y);
+                vertex(this.x + this.width * 0.25, this.y);
+                vertex(this.x + this.width * 0.65, height - 100);
+                vertex(this.x - this.width * 0.65, height - 100);
+                endShape(CLOSE);
+            }
+    }
+    }
     
     trees =[
     {x_pos:  100,  y_pos: height/2 + 55, width: 70, height: 120},
@@ -26,39 +75,31 @@ function setup()
         {x_pos: 250,  y_pos: 50, size: 60,  radius:  75}, 
         {x_pos: 600,  y_pos: 150, size: 60,  radius:  70}, 
         ];
+    
+    brightnessArrary();
 }
 
-function draw()
-{
+function draw(){
+    
+    drawBackround();
+    drawTrees();
+    drawClouds();
+    drawUfo();
+    
+}
+
+
+
+function drawBackround(){
+    
+    //Drawing Sky Background
     background(55,0,88);
     
-    //Draws the Background
+    //Drawing Grass
     fill(0,55,0);
     rect(0,height - 100, width, 100);
     
-    //Drawing the UFO
-    fill(175,238,238);
-    arc(ufo_x,ufo_y,75,100,PI,TWO_PI)
-    
-    fill(150);
-    arc(ufo_x,ufo_y,150,50,PI,TWO_PI);
-    
-    fill(50);
-    arc(ufo_x,ufo_y,150,25,0,PI);
-    
-    ufo_x += random(-5, 5);
- 
-    
-    
-    
-    drawTrees();
-    drawClouds();
-    
 }
-
-
-
-
 function drawTrees(){
     for(var i = 0; i < trees.length; i++){
         
@@ -179,4 +220,70 @@ function drawClouds(){
     }
         
 }
+function drawUfo(){
+    
+    //Calling Hovering Effect
+    
+    if(ufo.beam_on == true){
+        
+        ufo.beam();
+    }
 
+    
+    //Drawing the UFO
+    fill(175,238,238);
+    arc(
+        ufo.x,
+        ufo.y,
+        ufo.width * ufo.window_width,
+        ufo.height * ufo.window_height,
+        PI,
+        TWO_PI
+    )
+    
+    fill(150);
+    arc(
+        ufo.x,
+        ufo.y,
+        ufo.width,
+        ufo.height/2,
+        PI,
+        TWO_PI);
+    
+    fill(50);
+    arc(
+        ufo.x,
+        ufo.y,
+        ufo.width,
+        ufo.height * ufo.base_height,
+        0,
+        PI);
+    
+    //Calling Hovering Effect
+    ufo.hover();
+    
+    //Calling UFO Lights Effect
+    ufo.lights_on();
+    
+
+    
+    
+        
+    }
+function brightnessArrary(){
+    
+    //Creating values for brightness array
+     for(var i = 0; i < ufo.num_lights; i++){
+        
+     ufo.brightness.push((i * 15) % 255);
+    }
+       
+}
+function keyPressed(){
+    
+    ufo.beam_on = true;
+}
+function keyReleased(){
+    
+    ufo.beam_on = false;
+}
