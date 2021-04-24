@@ -5,35 +5,38 @@
 var flyingSaucers;
 var trees;
 var clouds;
+var cow;
 
 function setup()
 {
-    createCanvas(1200,600);
+    createCanvas(1600,600);
     noStroke();
     
     
     flyingSaucers = [];
-    
-    for (var i = 0; i < 5; i++)
+    for (var i = 0; i < 3; i++)
         {
             flyingSaucers.push(new Ufo(
-                100 + i * 250, //x
+                100 + i * 550, //x
                 100 + i * 40, //y
                 100 + i * 30, //width
                 0.5 + i * 0.05 //window_width
             ));
         }
-    
+
+    penguin = new Penguin(width/2, height - 100, 5, 1);
     trees =[
     {x_pos:  100,  y_pos: height/2 + 55, width: 70, height: 120},
     {x_pos:  300,  y_pos: height/2 + 55, width: 70, height: 120},
     {x_pos:  600,  y_pos: height/2 + 55, width: 70, height: 120},
-    {x_pos:  1000,  y_pos: height/2 + 55, width: 70, height: 120},
+    {x_pos:  900,  y_pos: height/2 + 55, width: 70, height: 120},
+    {x_pos:  1500,  y_pos: height/2 + 55, width: 70, height: 120},
      ];
     
     clouds=[
-        {x_pos: 250,  y_pos: 50, size: 60,  radius:  75}, 
-        {x_pos: 600,  y_pos: 150, size: 60,  radius:  70}, 
+        {x_pos: 250,  y_pos: 50, size:  60,  radius: 75}, 
+        {x_pos: 600,  y_pos: 150, size: 60,  radius: 70}, 
+        {x_pos: 1000, y_pos: 250, size: 60,  radius: 80}, 
         ];
 
 }
@@ -43,30 +46,40 @@ function draw(){
     drawBackround();
     drawTrees();
     drawClouds();
+    drawMoon();
+
     
     for(var i = 0; i < flyingSaucers.length; i++){
         
                 flyingSaucers[i].draw_ufo();  
                 flyingSaucers[i].hover();
     }
-
-
-
+    
+    penguin.draw();
     
 }
-
-
 
 function drawBackround(){
     
     //Drawing Sky Background
     background(55,0,88);
     
-    //Drawing Grass
-    fill(0,55,0);
+    //Drawing Snow
+    fill(255, 250, 250);
     rect(0,height - 100, width, 100);
     
 }
+function drawMoon(){
+    
+        fill(245,245,245); //Moon
+        noStroke();
+        ellipse(width,height-height,150);
+        fill(169,169,169);
+        ellipse(width-10,height-height +25,15);
+        ellipse(width-40,height-height,+50, 50);
+        ellipse(width-30,height-height +45,5);
+    
+    }		
 function drawTrees(){
     for(var i = 0; i < trees.length; i++){
         
@@ -187,22 +200,26 @@ function drawClouds(){
     }
         
 }
-
-    
-
 function Ufo(x,y, width, window_width){
-     
-        this.x      = x;
-        this.y      = y;
-        this.width  = width;
-        this.height = 60;
-            
-        this.window_width  = window_width;
-        this.window_height = 1.2;
-        this.base_height   = 0.45;
-        this.num_lights    = 20;
-        this.brightness    = [];
-        this.beam_on       = false;
+        
+        //Public Variables
+        this.x            = x;
+        this.y            = y;
+        this.beam_on      = false;
+
+        //Private Variables
+        var brightness    = [];
+        var ufo_height    = 60;
+        var window_height = 1.2;
+        var base_height   = 0.45;
+        var num_lights    = floor(random(10,22));
+        var light_inc     = floor(random(1,4));
+        var width         = width;
+        var window_width  = window_width;
+    
+        //Private Methods
+        var self          = this;
+
             
         this.draw_ufo = function (){
             
@@ -211,7 +228,7 @@ function Ufo(x,y, width, window_width){
 
             if(this.beam_on == true){
 
-                this.beam();
+                beam();
             }
 
 
@@ -220,8 +237,8 @@ function Ufo(x,y, width, window_width){
             arc(
                 this.x,
                 this.y,
-                this.width * this.window_width,
-                this.height * this.window_height,
+                width * window_width,
+                ufo_height * window_height,
                 PI,
                 TWO_PI
             )
@@ -230,8 +247,8 @@ function Ufo(x,y, width, window_width){
             arc(
                 this.x,
                 this.y,
-                this.width,
-                this.height/2,
+                width,
+                ufo_height/2,
                 PI,
                 TWO_PI);
 
@@ -239,18 +256,18 @@ function Ufo(x,y, width, window_width){
             arc(
                 this.x,
                 this.y,
-                this.width,
-                this.height * this.base_height,
+                width,
+                ufo_height * base_height,
                 0,
                 PI);
             
-            this.brightness_arrary();
-            this.lights_on();
+            brightness_arrary();
+            lights_on();
             this.hover();
 
             
         };    
-        this.beam = function(){
+        var beam = function(){
         
  
             
@@ -259,10 +276,10 @@ function Ufo(x,y, width, window_width){
                 
                 fill(255,255, 100, 150);
                 beginShape();
-                vertex(this.x - this.width * 0.25, this.y);
-                vertex(this.x + this.width * 0.25, this.y);
-                vertex(this.x + this.width * 0.65, height - 100);
-                vertex(this.x - this.width * 0.65, height - 100);
+                vertex(self.x - width * 0.25, self.y);
+                vertex(self.x + width * 0.25, self.y);
+                vertex(self.x + width * 0.65, height - 100);
+                vertex(self.x - width * 0.65, height - 100);
                 endShape(CLOSE);
             }
     };      
@@ -280,33 +297,102 @@ function Ufo(x,y, width, window_width){
                     this.beam_on = true;
             }
         };    
-        this.lights_on = function(){
+        var lights_on = function(){
             
-            var increment = this.width/(this.num_lights - 1);
+            var increment = width/(num_lights - 1);
     
             fill(255);
-            for(var i = 0; i < this.num_lights; i++){
+            for(var i = 0; i < num_lights; i++){
 
-                fill(this.brightness[i])
+                fill(brightness[i])
                 ellipse(
-                    this.x - this.width/2 + increment * i, 
-                    this.y, 
+                    self.x - width/2 + increment * i, 
+                    self.y, 
                     5
                     );
 
                 //Animating lights
-                this.brightness[i] += 1;
-                this.brightness[i] =this.brightness[i] % 255;
+                brightness[i] += light_inc;
+                brightness[i] =brightness[i] % 255;
         }
 };     
-        this.brightness_arrary = function (){
+        var brightness_arrary = function (){
 
             //Creating values for brightness array
-             for(var i = 0; i < this.num_lights; i++){
+             for(var i = 0; i < num_lights; i++){
 
-             this.brightness.push((i * 15) % 255);
+             brightness.push((i * light_inc) % 255);
             }
        
 };
+    }  
+function Penguin(x, y, range, speed){
+    
+    this.x = x;
+    this.y = y;
+    this.range = range;
+    this.speed = speed;
+    
+    this.currentX = x;
+    this.increment = speed;
+    
+    this.update = function(){
+        
+        this.currentX += this.increment;
+        if(this.currentX >= this.x + this.range){
+            
+                this.increment -= speed;
+            }
+        else if(this.currentX < this.x){
+            
+                this.increment += speed;
+            }
+        
     }
+    this.draw = function(){   
+        
+        this.update();
+        fill(255,0,0)
+  
+      //drawing the body
+        noStroke();
+        fill(0);
+        ellipse(this.currentX, this.y - 35, 23, 25); //draw head
+        ellipse(this.currentX, this.y - 20, 33, 40); // draw body
+
+        fill(255);
+        ellipse(this.currentX, this.y - 14.5, 23.5, 28); //draw belly
+
+        noStroke();
+        ellipse(this.currentX, this.y -10, 24, 20); //drawing belly outline
+
+        noStroke();
+        smooth();
+        fill(255,160, 122);
+        triangle(this.currentX - 5, this.y - 34, this.currentX + 5, this.y - 34, this.currentX, this.y - 26); // drawing the mouth
+
+        fill(255,255,240);
+        ellipse(this.currentX - 2.5, this.y - 38,   7, 5 ); //draw eyes
+        ellipse(this.currentX + 2.5, this.y - 37.3, 7, 8 ); //draw eyes 2
+
+        fill(0);
+        ellipse(this.currentX - 2.5, this.y - 38, 1 , 2); //draw iris
+        ellipse(this.currentX + 2.5, this.y - 38, 1 , 2); //draw iris 2
+
+        fill(255,160,122)
+        stroke(0);
+        strokeWeight(0.2);
+        arc(this.currentX - 5, this.y + 2, 10, 10, PI, 2*PI);//draw feet
+        arc(this.currentX + 5, this.y + 2, 10, 10, PI, 2*PI);//draw feet
+
+        fill(128)
+        noStroke();
+        arc(this.currentX - 14, this.y - 20, 5, 20, 1.2*PI/2, 3*PI/2); //draw arm
+        arc(this.currentX + 15, this.y - 20, 5, 20, 3*PI/2, 0.8*PI/2); //draw arm    
+            
+    }
+    
+    }   
+    
+
     

@@ -85,7 +85,7 @@ function draw(){
     drawTrees();
     drawClouds();
     drawUfo();
-    
+    drawMoon();
 }
 
 
@@ -220,6 +220,17 @@ function drawClouds(){
     }
         
 }
+function drawMoon(){
+    
+        fill(245,245,245); //Moon
+        noStroke();
+        ellipse(width,height-height,150);
+        fill(169,169,169);
+        ellipse(width-10,height-height +25,15);
+        ellipse(width-40,height-height,+50, 50);
+        ellipse(width-30,height-height +45,5);
+    
+    }
 function drawUfo(){
     
     //Calling Hovering Effect
