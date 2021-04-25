@@ -5,7 +5,7 @@
 var flyingSaucers;
 var trees;
 var clouds;
-var cow;
+var penguinManager;
 
 function setup()
 {
@@ -24,7 +24,10 @@ function setup()
             ));
         }
 
-    penguin = new Penguin(width/2, height - 100, 5, 1);
+    penguin = new Penguin(width/2, height - 100, 500, 1);
+    
+    penguinManager = new PenguinManager(-900, height - 100, 800, 0);
+    
     trees =[
     {x_pos:  100,  y_pos: height/2 + 55, width: 70, height: 120},
     {x_pos:  300,  y_pos: height/2 + 55, width: 70, height: 120},
@@ -55,6 +58,8 @@ function draw(){
                 flyingSaucers[i].hover();
     }
     
+    penguinManager.update();
+    penguinManager.draw()
     penguin.draw();
     
 }
@@ -333,10 +338,11 @@ function Penguin(x, y, range, speed){
     this.range = range;
     this.speed = speed;
     
-    this.currentX = x;
-    this.increment = speed;
     
-    this.update = function(){
+    this.currentX = x;
+    this.increment = random(1,3);
+    
+    this.walk = function(){
         
         this.currentX += this.increment;
         if(this.currentX >= this.x + this.range){
@@ -351,7 +357,7 @@ function Penguin(x, y, range, speed){
     }
     this.draw = function(){   
         
-        this.update();
+        this.walk();
         fill(255,0,0)
   
       //drawing the body
@@ -392,7 +398,32 @@ function Penguin(x, y, range, speed){
             
     }
     
-    }   
+    } 
+function PenguinManager(){
+    
+        this.minPenguins = 5;
+        var penguins = [];
+        
+        this.update = function(){
+            
+            if(penguins.length < this.minPenguins){
+                
+                    penguins.push(new Penguin(100, height - 100, 1400, 0.5 ))
+            }
+            for(var i = 0; i < penguins.length; i++) {
+                
+                penguins[i].walk();
+            }
+        } 
+        this.draw = function(){
+            
+            for(var i = 0; i < penguins.length; i++){
+                
+                penguins[i].draw();
+            }
+        }
+    
+}
     
 
     
