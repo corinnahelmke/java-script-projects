@@ -7,22 +7,13 @@ var trees;
 var clouds;
 var penguinManager;
 
-function setup()
-{
+function setup(){
+    
     createCanvas(1600,600);
     noStroke();
     
     
-    flyingSaucers = [];
-    for (var i = 0; i < 3; i++)
-        {
-            flyingSaucers.push(new Ufo(
-                100 + i * 550, //x
-                100 + i * 40, //y
-                100 + i * 30, //width
-                0.5 + i * 0.05 //window_width
-            ));
-        }
+    ufo = new Ufo(width/2,100);
 
     penguin = new Penguin(width/2, height - 100, 500, 1);
     
@@ -51,16 +42,17 @@ function draw(){
     drawClouds();
     drawMoon();
 
-    
-    for(var i = 0; i < flyingSaucers.length; i++){
-        
-                flyingSaucers[i].draw_ufo();  
-                flyingSaucers[i].hover();
-    }
-    
     penguinManager.update();
     penguinManager.draw()
     penguin.draw();
+    
+    ufo.hover();
+    ufo.draw();
+    if(ufo.beam_on){   
+        
+        var boundary = ufo.getBeamBoundaries();
+        penguinManager.levitatePenguins(boundary, ufo.x, ufo.y);
+    }
     
 }
 
@@ -205,7 +197,7 @@ function drawClouds(){
     }
         
 }
-function Ufo(x,y, width, window_width){
+function Ufo(x,y){
         
         //Public Variables
         this.x            = x;
@@ -213,27 +205,26 @@ function Ufo(x,y, width, window_width){
         this.beam_on      = false;
 
         //Private Variables
-        var brightness    = [];
-        var ufo_height    = 60;
-        var window_height = 1.2;
-        var base_height   = 0.45;
-        var num_lights    = floor(random(10,22));
-        var light_inc     = floor(random(1,4));
-        var width         = width;
-        var window_width  = window_width;
-    
-        //Private Methods
-        var self          = this;
+
+        var ufo_width = random(150,250);
+        var ufo_height = random(75,125);
+        var window_width = random(0.65,0.85);
+        var window_height = random(0.75,1);
+        var base_height = random(0.25,0.5);
+        var num_lights = floor(random(5,25));
+        var light_inc = floor(random(5,10));
+        var brightnesses = [];
+        var beamWidth = 140;
 
             
-        this.draw_ufo = function (){
+        this.draw = function (){
             
 
             //Calling Hovering Effect
 
             if(this.beam_on == true){
 
-                beam();
+                this.beam();
             }
 
 
@@ -242,52 +233,47 @@ function Ufo(x,y, width, window_width){
             arc(
                 this.x,
                 this.y,
-                width * window_width,
+                ufo_width * window_width,
                 ufo_height * window_height,
-                PI,
-                TWO_PI
-            )
+                PI,TWO_PI);
 
             fill(150);
             arc(
                 this.x,
                 this.y,
-                width,
+                ufo_width,
                 ufo_height/2,
-                PI,
-                TWO_PI);
+                PI,TWO_PI);
 
             fill(50);
             arc(
                 this.x,
                 this.y,
-                width,
+                ufo_width,
                 ufo_height * base_height,
-                0,
-                PI);
+                0,PI);
             
-            brightness_arrary();
-            lights_on();
-            this.hover();
+            //Drawing the lights
+            var incr = (ufo_width/(num_lights -1)); 
 
-            
-        };    
-        var beam = function(){
-        
- 
-            
-            //Induces Flickering
-            if(random() > 0.25){
-                
-                fill(255,255, 100, 150);
-                beginShape();
-                vertex(self.x - width * 0.25, self.y);
-                vertex(self.x + width * 0.25, self.y);
-                vertex(self.x + width * 0.65, height - 100);
-                vertex(self.x - width * 0.65, height - 100);
-                endShape(CLOSE);
+            for(var i = 0; i < num_lights; i++)
+            {
+
+                var x = this.x - ufo_width/2 + i * incr;
+                fill(brightnesses[i]);
+                ellipse(
+                    x,
+                    this.y,
+                    5,
+                    5
+                )
+                brightnesses[i] += light_inc;
+                if(brightnesses[i] > 255)
+                {
+                    brightnesses[i] = 100;
+                }
             }
-    };      
+        }   
         this.hover = function(){
             
             this.x += random(-2, 2);
@@ -301,42 +287,44 @@ function Ufo(x,y, width, window_width){
                 
                     this.beam_on = true;
             }
-        };    
-        var lights_on = function(){
-            
-            var increment = width/(num_lights - 1);
-    
-            fill(255);
-            for(var i = 0; i < num_lights; i++){
-
-                fill(brightness[i])
-                ellipse(
-                    self.x - width/2 + increment * i, 
-                    self.y, 
-                    5
-                    );
-
-                //Animating lights
-                brightness[i] += light_inc;
-                brightness[i] =brightness[i] % 255;
+        }    
+        this.beam = function(){
+             
+            //Induces Flickering
+        if(random() > 0.25){
+            fill(255,255,100,150);
+            beginShape();
+            vertex(this.x - 25,this.y + ufo_height * base_height * 0.5);
+            vertex(this.x + 25,this.y + ufo_height * base_height * 0.5);
+            vertex(this.x + beamWidth/2,height - 100);
+            vertex(this.x - beamWidth/2,height - 100);
+            endShape();
         }
-};     
-        var brightness_arrary = function (){
+    };  
+        this.getBeamBoundaries = function(){
+            
+            var boundaries = [];
+            boundaries.push(this.x - beamWidth/2);
+            boundaries.push(this.x + beamWidth/2);
+            return boundaries;
 
-            //Creating values for brightness array
-             for(var i = 0; i < num_lights; i++){
-
-             brightness.push((i * light_inc) % 255);
-            }
-       
-};
     }  
+        
+        for(var i = 0; i < num_lights; i++){
+            
+            brightnesses.push((i * light_inc * 2)%255);
+        }
+}
+     
 function Penguin(x, y, range, speed){
     
     this.x = x;
     this.y = y;
     this.range = range;
     this.speed = speed;
+    this.flyingSaucerRef = null;
+    this.flagForDeletion = false;
+    this.isFrozen = false;
     
     
     this.currentX = x;
@@ -401,29 +389,118 @@ function Penguin(x, y, range, speed){
     } 
 function PenguinManager(){
     
-        this.minPenguins = 5;
-        var penguins = [];
+        this.minPenguins = 10;
+        this.penguins = [];
         
         this.update = function(){
             
-            if(penguins.length < this.minPenguins){
+            //Adding new penguins if necessary
+            if(this.penguins.length < this.minPenguins){
                 
-                    penguins.push(new Penguin(100, height - 100, 1400, 0.5 ))
+                    this.penguins.push(new Penguin(100, height - 100, 1400, 0.5 ))
             }
-            for(var i = 0; i < penguins.length; i++) {
-                
-                penguins[i].walk();
-            }
-        } 
-        this.draw = function(){
             
-            for(var i = 0; i < penguins.length; i++){
+                        
+            for(var i = 0; i < this.penguins.length; i++){
                 
-                penguins[i].draw();
+                        if(!this.penguins[i].isFrozen){
+                            
+                            if(this.penguins[i].y < height - 100){
+                                
+                                //Drawing falling penguins
+                                this.penguins[i].y += 3;
+                            }
+                        else{
+                            
+                                //Drawing regular walking penguins
+                                this.penguins[i].walk();
+                            
+                                if(this.penguins[i].x > width + 200){
+                                    this.penguins[i].x = -200;
+                                }
+                            
+                                else if(this.penguins[i].x < -200)
+                                    {
+                                        this.penguins[i].x = width + 200;
+                                    }       
+                        }
+                    }  
+                        else{
+                            //Resetting next frame
+                            this.penguins[i].isFrozen = false;
+                        }
+            }
+            
+            //Removing old pengiuns
+            for(var i = this.penguins.length - 1; i >= 0; i --){
+                
+                    if(this.penguins[i].flagForDeletion){
+                        
+                            this.penguins.splice(i,1);
+                    }
             }
         }
-    
+            
+
+        
+        this.draw = function(){
+            
+            for(var i = 0; i < this.penguins.length; i++){
+                
+                this.penguins[i].draw();
+            }
+        }
+        this.checkForPenguins = function(x1, x2){
+            
+                //Returning all penguins between the two points
+                var penguins = [];
+                
+                for(var i = 0; i < this.penguins.length; i++){
+                    
+                        if(this.penguins[i].x >= x1 && this.penguins[i].x <= x2){
+                            
+                                penguins.push(this.penguins[i]);
+                        }
+                }
+            return penguins;
+        }
+        
+//        this.checkContact = function(gc_x, gc_y){
+//        
+//        var distance = dist(gc_x, gc_y, this.currentX, this.y)
+//            if(distance < 10){
+//                
+//                    return true;
+//                }
+//            return false;
+//        }
+     
+       
+        this.levitatePenguins = function(boundaries, x_anchor, y_cutoff){
+        
+                        var penguins = this.checkForPenguins(boundaries[0], boundaries[1]);
+        
+                        //Beaming Penguins up
+                        for(var i = 0 ; i < penguins.length; i++){ 
+                            
+                        penguins[i].x = x_anchor;
+                        penguins[i].y -= 10;
+                        penguins[i].isFrozen = true;
+
+                        if(penguins[i].y < y_cutoff){
+                            
+                            penguins[i].flagForDeletion = true;
+                        }
+                    }
+        }
+        
+        
 }
+        
+        
+    
+
+
     
 
     
